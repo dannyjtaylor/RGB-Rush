@@ -23,6 +23,10 @@
 /* USER CODE BEGIN Includes */
 #include "string.h"
 #include "stdio.h"
+#include <stdlib.h> // for rand()
+#include <time.h>   // for seeding rand()
+
+
 
 /* USER CODE END Includes */
 
@@ -71,6 +75,45 @@ void UART_SEND(UART_HandleTypeDef *huart, char buffer[])
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// --- Convert flags to string color name ---
+const char* flagToColor(uint8_t flag) {
+    switch(flag) {
+        case 0: return "OFF";
+        case 1: return "RED";
+        case 2: return "GREEN";
+        case 3: return "BLUE";
+        default: return "UNKNOWN"; //debugging. Should never happen
+    }
+}
+
+// --- Convert target flags to secondary color ---
+const char* targetToSecondary(uint8_t f1, uint8_t f2) {
+    if((f1==1 && f2==2)||(f1==2 && f2==1)) return "YELLOW";
+    if((f1==2 && f2==3)||(f1==3 && f2==2)) return "CYAN";
+    if((f1==1 && f2==3)||(f1==3 && f2==1)) return "MAGENTA";
+    if(f1 == f2) {
+        switch(f1) {
+            case 1: return "RED";
+            case 2: return "GREEN";
+            case 3: return "BLUE";
+        }
+    }
+    return "UNKNOWN"; // debug
+}
+
+void assignNewTarget(uint8_t *targetFlag1, uint8_t *targetFlag2) {
+    int choice = rand() % 6; // 0-2 for secondary colors, 3-5 for single colors
+    switch(choice) {
+        case 0: *targetFlag1 = 1; *targetFlag2 = 2; break; // YELLOW = RED + GREEN
+        case 1: *targetFlag1 = 2; *targetFlag2 = 3; break; // CYAN = GREEN + BLUE
+        case 2: *targetFlag1 = 1; *targetFlag2 = 3; break; // MAGENTA = RED + BLUE
+        case 3: *targetFlag1 = 1; *targetFlag2 = 1; break; // RED target
+        case 4: *targetFlag1 = 2; *targetFlag2 = 2; break; // GREEN target
+        case 5: *targetFlag1 = 3; *targetFlag2 = 3; break; // BLUE target
+    }
+}
+
+
 /* USER CODE END 0 */
 
 /**
@@ -81,18 +124,24 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	char buff[10];
-	// Set 1 (LED1)
-	uint8_t flagOff1 = 0;
-	uint8_t flagGreen1 = 0;
-	uint8_t flagBlue1 = 0;
-	uint8_t flagRed1 = 0;
+	char buff[50];
 
-	// Set 2 (LED2)
-	uint8_t flagOff2 = 0;
-	uint8_t flagGreen2 = 0;
-	uint8_t flagBlue2 = 0;
-	uint8_t flagRed2 = 0;
+	// --- Define flags for ADC1 and ADC2 ---
+	uint8_t flagOff1=0, flagGreen1=0, flagBlue1=0, flagRed1=0;
+	uint8_t flagOff2=0, flagGreen2=0, flagBlue2=0, flagRed2=0;
+
+	// --- Target flags ---
+	uint8_t targetFlag1=0, targetFlag2=0;
+
+	// --- Function to assign a new target secondary color ---
+
+	srand(HAL_GetTick()); // Seed random generator
+	assignNewTarget(&targetFlag1, &targetFlag2);
+
+
+
+
+
 
 
   /* USER CODE END 1 */
@@ -131,43 +180,49 @@ int main(void)
 
   while(1)
   {
-      // --- ADC1 ---
+      // --- Read ADC1 ---
       HAL_ADC_PollForConversion(&hadc1, 100);
       uint32_t adc1Result = HAL_ADC_GetValue(&hadc1);
       float percentage1 = ((float)adc1Result / 3600.0f) * 100.0f;
 
-      if(adc1Result < 1000) {
-          flagOff1 = 1; flagGreen1 = 0; flagBlue1 = 0; flagRed1 = 0;
-      } else if(adc1Result < 1700) {
-          flagOff1 = 0; flagGreen1 = 1; flagBlue1 = 0; flagRed1 = 0;
-      } else if(adc1Result < 2600) {
-          flagOff1 = 0; flagGreen1 = 0; flagBlue1 = 1; flagRed1 = 0;
-      } else {
-          flagOff1 = 0; flagGreen1 = 0; flagBlue1 = 0; flagRed1 = 1;
-      }
+      // --- Update LED1 flags ---
+      if(adc1Result < 1000) { flagOff1=1; flagGreen1=0; flagBlue1=0; flagRed1=0; }
+      else if(adc1Result < 1700) { flagOff1=0; flagGreen1=1; flagBlue1=0; flagRed1=0; }
+      else if(adc1Result < 2600) { flagOff1=0; flagGreen1=0; flagBlue1=1; flagRed1=0; }
+      else { flagOff1=0; flagGreen1=0; flagBlue1=0; flagRed1=1; }
 
-      // --- ADC2 ---
+      uint8_t currentFlag1 = flagRed1?1:(flagGreen1?2:(flagBlue1?3:0));
+
+      // --- Read ADC2 ---
       HAL_ADC_PollForConversion(&hadc2, 100);
       uint32_t adc2Result = HAL_ADC_GetValue(&hadc2);
       float percentage2 = ((float)adc2Result / 3600.0f) * 100.0f;
 
-      if(adc2Result < 1000) {
-          flagOff2 = 1; flagGreen2 = 0; flagBlue2 = 0; flagRed2 = 0;
-      } else if(adc2Result < 1700) {
-          flagOff2 = 0; flagGreen2 = 1; flagBlue2 = 0; flagRed2 = 0;
-      } else if(adc2Result < 2600) {
-          flagOff2 = 0; flagGreen2 = 0; flagBlue2 = 1; flagRed2 = 0;
-      } else {
-          flagOff2 = 0; flagGreen2 = 0; flagBlue2 = 0; flagRed2 = 1;
+      // --- Update LED2 flags ---
+      if(adc2Result < 1000) { flagOff2=1; flagGreen2=0; flagBlue2=0; flagRed2=0; }
+      else if(adc2Result < 1700) { flagOff2=0; flagGreen2=1; flagBlue2=0; flagRed2=0; }
+      else if(adc2Result < 2600) { flagOff2=0; flagGreen2=0; flagBlue2=1; flagRed2=0; }
+      else { flagOff2=0; flagGreen2=0; flagBlue2=0; flagRed2=1; }
+
+      uint8_t currentFlag2 = flagRed2?1:(flagGreen2?2:(flagBlue2?3:0));
+
+      // --- Check target match (either LED1 or LED2 can satisfy target) ---
+      uint8_t matched1 = (currentFlag1==targetFlag1)||(currentFlag1==targetFlag2);
+      uint8_t matched2 = (currentFlag2==targetFlag1)||(currentFlag2==targetFlag2);
+
+      if(currentFlag1 == targetFlag1 && currentFlag2 == targetFlag2) {
+          sprintf(buff, "SUCCESS! Target %s achieved!\r\n", targetToSecondary(targetFlag1,targetFlag2));
+          UART_SEND(&huart2,buff);
+          HAL_Delay(500);
+          assignNewTarget(&targetFlag1, &targetFlag2);
       }
+      // --- Output status line ---
+      sprintf(buff,"Target: %s, LED1: %s %.0f%%, LED2: %s %.0f%%\r\n",
+              targetToSecondary(targetFlag1,targetFlag2),
+              flagToColor(currentFlag1), percentage1,
+              flagToColor(currentFlag2), percentage2);
 
-      // --- COMBINED UART OUTPUT ---
-      char buff[100];
-      const char* color1 = (flagOff1) ? "OFF" : (flagGreen1) ? "GREEN" : (flagBlue1) ? "BLUE" : "RED";
-      const char* color2 = (flagOff2) ? "OFF" : (flagGreen2) ? "GREEN" : (flagBlue2) ? "BLUE" : "RED";
-
-      sprintf(buff, "LED1: %s %.0f%%, LED2: %s %.0f%%\r\n", color1, percentage1, color2, percentage2);
-      UART_SEND(&huart2, buff);
+      UART_SEND(&huart2,buff);
 
       HAL_Delay(300);
     /* USER CODE END WHILE */
