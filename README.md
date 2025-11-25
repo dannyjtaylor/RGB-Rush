@@ -1,5 +1,5 @@
 # 🎮 RGB Rush — Color Mix Pressure Game
-An interactive embedded-systems game where players match a randomly generated target color using pressure sensors and RGB LEDs. Built for Arduino / STM32 / ESP32 platforms using FreeRTOS (or equivalent).
+An interactive embedded-systems game where players match a randomly generated target color using pressure sensors and RGB LEDs. Built for a STM32-F446RE board using FreeRTOS.
 
 ---
 
