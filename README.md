@@ -1,4 +1,4 @@
-# 🎮 RGB Rush — Color Mix Pressure Game
+# 🎮 RGB Rush - Color Mix Pressure Game
 An interactive embedded-systems game where players match a randomly generated target color using pressure sensors and RGB LEDs. Built for a STM32-F446RE board using FreeRTOS.
 
 ---
@@ -48,24 +48,24 @@ An interactive embedded-systems game where players match a randomly generated ta
 
 ## Game Flow
 
-## **Step 1 — Game Start**
+## **Step 1 - Game Start**
 - Generate a **random target color** (purple, cyan, yellow, etc.)  
 - Display the target LED  
 - Timer resets to 0  
 - Round display starts at **Round 1**  
 - Timer begins counting  
 
-## **Step 2 — User Input**
+## **Step 2 - User Input**
 - User applies pressure to **two sensors**  
 - Each sensor controls one primary color channel  
 - Pressure intensity determines LED brightness (PWM)  
 - Mixed LED updates live as the intensity changes
 
-## **Step 3 — Matching Process**
+## **Step 3 - Matching Process**
 - Compare current mix vs target continuously  
 - Loop until match occurs or **60s timeout**  
 
-## **Step 4 — Game Over / Round Completion**
+## **Step 4 - Game Over / Round Completion**
 - If matched → Target LED & Mix LED blink  
 - Timer stops  
 - Round increments  
@@ -148,19 +148,19 @@ An interactive embedded-systems game where players match a randomly generated ta
 
 ## Developer Responsibilities
 
-### **Ethan — Timer & 7-Segment Displays**
+### **Ethan - Timer & 7-Segment Displays**
 - Handles: timer counting, timeout events, round display  
 - Queues: `timerQueue`, `roundQueue`  
 - Semaphores: `timerResetSemaphore`, listens to `colorMatchSemaphore`  
 - Mutexes: `displayMutex`  
 
-### **Danny — LED Control & Color Mixing**
+### **Danny - LED Control & Color Mixing**
 - Handles: PWM LED output, color mixing, target comparison  
 - Queues: receives `sensorQueue`, sends `mixQueue`  
 - Semaphores: `colorMatchSemaphore`  
 - Mutexes: `ledMutex`  
 
-### **Gaspar — Pressure Sensors**
+### **Gaspar - Pressure Sensors**
 - Handles: ADC readings, intensity mapping, sensor reset  
 - Queues: sends `sensorQueue`  
 - Semaphores: `newRoundSemaphore`  
