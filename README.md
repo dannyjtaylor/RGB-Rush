@@ -17,6 +17,7 @@ multiplexing.
 4.  Hardware Setup
 5.  Software Implementation
 6.  Getting Started
+7.  Limitations and Next Steps
 
 ## 📽️ Project Overview
 
@@ -203,4 +204,18 @@ Use **PuTTY** as the terminal to monitor serial logs and debug the application:
   - Monitor real-time game logs
   - Debug sensor readings and color states
   - Track RTOS task execution
+
+## ⚠️ Limitations and Next Steps
+
+### Current Limitations
+
+1. **GPIO Resource Exhaustion:** Direct-drive architecture uses unique GPIO pins for each LED segment, exhausting I/O resources and preventing scalability. Future expansion requires shift registers or I/O expanders via SPI/I2C.
+
+2. **Constrained Color Palette:** Two analog inputs limit color output to seven discrete combinations. Quantizing pressure into ON/OFF states prevents continuous PWM, blocking subtle shades and tertiary colors.
+
+### Future Improvements
+
+- **Scalable I/O:** Implement shift registers (74HC595) or I/O expanders (MCP23017) to manage multiple LEDs through serial communication, enabling expansion without exhausting GPIO pins.
+
+- **Enhanced Color Mixing:** Replace discrete color mapping with continuous PWM control based on analog pressure values. This enables smooth color transitions, intermediate shades, and full RGB color space access.
 
