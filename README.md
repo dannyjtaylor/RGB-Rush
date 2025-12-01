@@ -18,15 +18,23 @@ Watch the project in action!
 
 [**Watch on YouTube**](https://www.youtube.com/shorts/EqMBvf5Gu94)
 
+## 📄 Project Poster
+
+![RGB Rush Project Poster](Embedded%20OS%20Final%20Trifold.png)
+
+*Project trifold poster showcasing the RGB Rush project.*
+
 ## 📖 Table of Contents
 
-1.  Project Overview
-2.  Game Mechanics
-3.  System Architecture
-4.  Hardware Setup
-5.  Software Implementation
-6.  Getting Started
-7.  Limitations and Next Steps
+1.  Demo Video
+2.  Project Poster
+3.  Project Overview
+4.  Game Mechanics
+5.  System Architecture
+6.  Hardware Setup
+7.  Software Implementation
+8.  Getting Started
+9.  Limitations and Next Steps
 
 ## 📽️ Project Overview
 
