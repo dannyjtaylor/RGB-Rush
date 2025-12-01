@@ -9,6 +9,15 @@ rendering** into concurrent RTOS tasks. It features analog sensor
 processing, additive color mixing, and high-speed hardware-driven
 multiplexing.
 
+## 🎥 Demo Video
+
+Watch the project in action! 
+(Thanks to volunteer Gianna Reyes)
+
+[![RGB Rush Demo](https://img.youtube.com/vi/EqMBvf5Gu94/maxresdefault.jpg)](https://www.youtube.com/shorts/EqMBvf5Gu94)
+
+[**Watch on YouTube**](https://www.youtube.com/shorts/EqMBvf5Gu94)
+
 ## 📖 Table of Contents
 
 1.  Project Overview
