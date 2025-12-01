@@ -1,4 +1,4 @@
-# 🔴🟢🔵 RGB Rush 🔴🟢🔵
+# 🔴🟢🔵 RGB Rush 🔵🟢🔴
 
 An embedded real-time reaction game built on the **STM32 Nucleo-F446RE**
 platform using **FreeRTOS**.
@@ -42,7 +42,7 @@ the player wins the round and the score updates.
 
 -   **Real-Time OS:** FreeRTOS (CMSIS-V1)
 -   **Concurrent Architecture:** Input, Logic, and Display tasks
--   **Inter-Process Communication:** Queues, Mutexes, Semaphores
+-   **Inter-Process Communication:** Queue, Mutex, Semaphore
 -   **High-Speed Interrupts:** 500 Hz TIM10 interrupt for flicker-free
     display
 -   **Analog Front-End:** Dual ADC channels with voltage-divider
