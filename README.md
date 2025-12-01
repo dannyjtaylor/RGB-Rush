@@ -17,7 +17,6 @@ multiplexing.
 4.  Hardware Setup
 5.  Software Implementation
 6.  Getting Started
-7.  License
 
 ## 📽️ Project Overview
 
@@ -51,99 +50,114 @@ Color**.
 -   **Left Sensor** Controls RGB LED #1
 -   **Right Sensor** Controls RGB LED #2
 
-### Pressure → Color Mapping
+### Pressure → Color
 
-  Pressure Range   Output Color
-  ---------------- --------------
-  11--33%          **Blue**
-  34--66%          **Green**
-  67--100%         **Red**
+| Pressure Range | Output  |
+|----------------|--------------|
+| 11–33%         | **Blue**     |
+| 34–66%         | **Green**    |
+| 67–100%        | **Red**      |
+
+Note that blue starts at 11% since 0-10 is expected noise from the sensor. This ensures that the LEDs are all **OFF** if nobody touches it.
 
 ### Color Mixing
 
-Additive mixing (e.g., Red + Blue → Magenta).
+Additive color mixing combines the two sensor colors to produce the final mixing color:
+
+| Sensor 1 | Sensor 2 | Mixed Color |
+|----------|----------|-------------|
+| Blue     | Blue     | **Blue**    |
+| Blue     | Green    | **Cyan**    |
+| Blue     | Red      | **Magenta** |
+| Green    | Blue     | **Cyan**    |
+| Green    | Green    | **Green**   |
+| Green    | Red      | **Yellow**  |
+| Red      | Blue     | **Magenta** |
+| Red      | Green    | **Yellow**  |
+| Red      | Red      | **Red**     |
 
 ### Winning Condition
 
--   Hold the matching color for **0.5 seconds**\
--   Score increments on the 7-segment display\
+-   Hold the matching color for ~**0.5 seconds**
+-   Score decrements from a set value on the Score Display
 -   Game ends when the countdown score reaches **0**
 
 ## ⚙️ System Architecture
 
-The software is built around **three primary RTOS tasks** and a
-**high-priority timer interrupt**.
+The software is built around **three primary RTOS tasks** & a **high-priority timer interrupt**.
 
 ### 1. Input Task --- "Producer"
 
--   Polls ADC sensors at 20 Hz\
--   Converts raw readings to color states\
+-   Polls ADC sensors at 20 Hz
+-   Converts raw readings to color states
 -   Sends data to `xInputQueue`
 
 ### 2. Logic Task --- "Game Brain"
 
--   Consumes sensor data\
--   Computes mixed color\
--   Tracks win timer and rounds\
--   Uses `xScoreMutex` for safe score updates\
+-   Consumes sensor data
+-   Computes mixed color
+-   Tracks win timer and rounds
+-   Uses `xScoreMutex` for safe score updates
 -   Signals `xWinSemaphore` when a round is won
 
 ### 3. Display Task --- "Renderer"
 
--   Updates RGB LEDs and 7-segment display\
--   Reads score (protected by `xScoreMutex`)\
+-   Updates RGB LEDs and 7-segment display
+-   Reads score (protected by `xScoreMutex`)
 -   Runs animations when `xWinSemaphore` is triggered
 
 ### 4. TIM10 ISR --- Multiplexing Interrupt (500 Hz)
 
--   Drives 3-digit 7-segment through time-division multiplexing\
+-   Drives 3-digit 7-segment through time-division multiplexing
 -   Provides flicker-free output
 
 ## 🔌 Hardware Setup
 
 ### Platform
 
--   STM32 Nucleo-F446RE\
+-   STM32 Nucleo-F446RE
 -   Morpho + Arduino headers
 
 ### Components
 
--   2× Force-Sensitive Resistors\
--   4× Common-Anode RGB LEDs\
--   1× 3-Digit Common-Cathode 7-Segment Display\
--   2× 10 kΩ resistors\
+-   2× Force-Sensitive Resistors
+-   4× Common-Anode RGB LEDs
+-   1× 3-Digit Common-Cathode 7-Segment Display
+-   2× 10 kΩ resistors
 -   12× 220 Ω resistors
 
 ### Pinout
 
-  ------------------------------------------------------------------------
-  Component          Function           STM32 Pin            Notes
-  ------------------ ------------------ -------------------- -------------
-  Sensor 1           P1 Input           PA0                  ADC1_IN0
-
-  Sensor 2           P2 Input           PA1                  ADC2_IN1
-
-  Player 1 LED       R/G/B              PC0, PC1, PC2        ---
-
-  Player 2 LED       R/G/B              PB0, PB1, PB2        ---
-
-  Mixing LED         R/G/B              PB6, PA6, PA7        ---
-
-  Target LED         R/G/B              PC5, PC6, PC8        ---
-
-  7-Segment Bus      Segments A--G      PA10, PB3, PB5, PB4, ---
-                                        PB10, PA8, PA9       
-
-  Digit Selects      D1/D2/D3           PC7, PB9, PB8        ---
-  ------------------------------------------------------------------------
+| Component      | Function        | STM32 Pin              | Notes      |
+|----------------|-----------------|------------------------|------------|
+| Sensor 1       | P1 Input        | PA0                    | ADC1_IN0   |
+| Sensor 2       | P2 Input        | PA1                    | ADC2_IN1   |
+| Player 1 LED   | R/G/B           | PC0, PC1, PC2          | —          |
+| Player 2 LED   | R/G/B           | PB0, PB1, PB2          | —          |
+| Mixing LED     | R/G/B           | PB6, PA6, PA7          | —          |
+| Target LED     | R/G/B           | PC5, PC6, PC8          | —          |
+| 7-Segment Bus  | Segments A–G    | PA10, PB3, PB5, PB4, PB10, PA8, PA9 | Ground Decimal Point |
+| Digit Selects  | SCORE/TENS/ONES        | PC7, PC9, PC3          | —          |
 
 ## 💻 Software Implementation
 
-### RTOS Configuration
-
--   TIM6 timebase\
--   Heap: 15,360 bytes\
--   Stack: 512 words
+### RTOS & IOC Configuration
+-   Pins above set as GPIO_Output accordingly
+-   SYS:
+    -   TIM6 timebase
+    -   Serial Wire
+    -   Clock Speed: 84 MHz
+-   Analog:
+    - IN0 (ADC1)
+    - IN1 (ADC2)
+-   Timer:
+    - TIM10
+        - Prescaler: 83
+        - Counter Period: 1999
+-   USART2 Interrupt
+-   TIM1, TIM10 Interrupt
+-   ADC Interrupt
+-   Everything else can be default
 
 ### Communication Objects
 
@@ -162,25 +176,31 @@ Runs every **2 ms**: 1. Disable all digits\
 
 ## 🚀 Getting Started
 
-### Clone
-
-``` bash
-git clone https://github.com/your-username/stm32-freertos-game.git
-```
+1. Download `finalProject.c` from the repository
+2. Follow the .IOC and FreeRTOS setup
+3. Build the RGB Rush Circuit
 
 ### Import
 
 STM32CubeIDE → *Open Projects from File System...*
 
-### Flash
+### Flash the Code
 
--   Connect Nucleo\
+-   Connect Nucleo
 -   Press **Run**
+OR
+- Debug (hammer Icon)
+- Use STM32CubeProgrammer
+  - Connect Board
+  - Click "**Start Programming**"
+### Monitor & Debugging
 
-### Monitor
+Use **PuTTY** as the terminal to monitor serial logs and debug the application:
 
-115200 baud, PuTTY/TeraTerm
+- **Baud Rate:** 115200
+- **Connection:** Serial COM port (check Device Manager for the correct port)
+- **Purpose:** 
+  - Monitor real-time game logs
+  - Debug sensor readings and color states
+  - Track RTOS task execution
 
-## 📄 License
-
-MIT License
