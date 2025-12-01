@@ -1,4 +1,4 @@
-# STM32 FreeRTOS Color Match Game
+# 🔴🟢🔵 RGB Rush 🔴🟢🔵
 
 An embedded real-time reaction game built on the **STM32 Nucleo-F446RE**
 platform using **FreeRTOS**.
@@ -11,32 +11,31 @@ multiplexing.
 
 ## 📖 Table of Contents
 
-1.  Project Overview\
-2.  Game Mechanics\
-3.  System Architecture\
-4.  Hardware Setup\
-5.  Software Implementation\
-6.  Getting Started\
+1.  Project Overview
+2.  Game Mechanics
+3.  System Architecture
+4.  Hardware Setup
+5.  Software Implementation
+6.  Getting Started
 7.  License
 
 ## 📽️ Project Overview
 
-The **Color Match Game** challenges players to match a random **Target
+**RGB Rush** challenges players to match a random **Target
 Color** by pressing two pressure sensors. Each sensor controls an RGB
-LED (Player 1 and Player 2), producing colors based on pressure
-intensity. These two colors are then additively mixed to generate a
-**Mixing Color**.
+LED, producing colors based on pressure intensity. These two colors are
+then additively mixed to generate a **Mixing Color**.
 
 When the Mixing Color matches the Target Color for a sustained duration,
 the player wins the round and the score updates.
 
 ### Key Technical Features
 
--   **Real-Time OS:** FreeRTOS (CMSIS-V1)\
--   **Concurrent Architecture:** Input, Logic, and Display tasks\
--   **Inter-Process Communication:** Queues, Mutexes, Semaphores\
+-   **Real-Time OS:** FreeRTOS (CMSIS-V1)
+-   **Concurrent Architecture:** Input, Logic, and Display tasks
+-   **Inter-Process Communication:** Queues, Mutexes, Semaphores
 -   **High-Speed Interrupts:** 500 Hz TIM10 interrupt for flicker-free
-    display\
+    display
 -   **Analog Front-End:** Dual ADC channels with voltage-divider
     conditioning
 
@@ -49,8 +48,8 @@ Color**.
 
 ### Controls
 
--   **Player 1 (Left Sensor):** Controls RGB LED #1\
--   **Player 2 (Right Sensor):** Controls RGB LED #2
+-   **Left Sensor** Controls RGB LED #1
+-   **Right Sensor** Controls RGB LED #2
 
 ### Pressure → Color Mapping
 
